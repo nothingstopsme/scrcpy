@@ -8,6 +8,7 @@ import java.io.IOException;
 public final class Server {
 
     private static final String SERVER_PATH = "/data/local/tmp/scrcpy-server";
+    private static final String KEY_TO_TOUCH_MAP_PATH = "/data/local/tmp/key-to-touch-map.xml";
 
     private Server() {
         // not instantiable
@@ -129,7 +130,12 @@ public final class Server {
         try {
             new File(SERVER_PATH).delete();
         } catch (Exception e) {
-            Ln.e("Could not unlink server", e);
+            Ln.e(String.format("Could not unlink %s", SERVER_PATH), e);
+        }
+        try {
+            new File(KEY_TO_TOUCH_MAP_PATH).delete();
+        } catch (Exception e) {
+            Ln.e(String.format("Could not unlink %s", KEY_TO_TOUCH_MAP_PATH), e);
         }
     }
 
@@ -140,6 +146,12 @@ public final class Server {
                 Ln.e("Exception on thread " + t, e);
             }
         });
+
+
+        if(new File(KEY_TO_TOUCH_MAP_PATH).exists())
+            KeyToTouchMap.instance.parse(KEY_TO_TOUCH_MAP_PATH);
+
+
 
         unlinkSelf();
         Options options = createOptions(args);
